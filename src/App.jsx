@@ -133,9 +133,10 @@ function App() {
           </p>
           <div className="hero-buttons">
             <a href="#contact" className="btn-primary">Write Me 💌</a>
-            <a href="https://github.com/Meftahul-Anu13" target="_blank" rel="noopener noreferrer" className="btn-secondary">My GitHub 🐙</a>
-            <a href="#projects" className="btn-accent">Browse Projects 📁</a>
+            <a href={`${import.meta.env.BASE_URL}cv.pdf`} download="Cv_Meftahul_Jannati_Anonna.pdf" className="btn-secondary">Download CV 📄</a>
+            <a href="https://github.com/Meftahul-Anu13" target="_blank" rel="noopener noreferrer" className="btn-accent">GitHub 🐙</a>
           </div>
+
         </div>
         <div className="hero-right">
           <div className="avatar-wrapper">
