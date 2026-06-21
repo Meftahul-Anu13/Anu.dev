@@ -955,7 +955,7 @@ function App() {
                   Euler's Constant (e ≈ 2.71) + 1.00 📉
                 </div>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '10px' }}>
-                  Hint: Check your browser developer console (Right Click -> Inspect -> Console) to view the raw logs! 💻🔍
+                  {"Hint: Check your browser developer console (Right Click -> Inspect -> Console) to view the raw logs! 💻🔍"}
                 </p>
                 <button onClick={() => setShowCgpaModal(false)} className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '20px' }}>
                   Awesome! 👍
