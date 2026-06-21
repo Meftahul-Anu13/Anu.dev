@@ -32,7 +32,41 @@ function App() {
       return { valid: false, message: `Did you mean ${email.split('@')[0]}@${commonTypos[domain]}?` }
     }
 
-    // 2. Query Disify API for MX / DNS and disposable status checking
+    const QUICKEMAIL_API_KEY = import.meta.env.VITE_QUICKEMAILVERIFICATION_API_KEY
+
+    // If QuickEmailVerification key is present, perform SMTP/Mailbox level checking
+    if (QUICKEMAIL_API_KEY && QUICKEMAIL_API_KEY !== "YOUR_QUICKEMAILVERIFICATION_API_KEY_HERE") {
+      try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+        const response = await fetch(`https://api.quickemailverification.com/v1/verify?email=${encodeURIComponent(email)}&apikey=${QUICKEMAIL_API_KEY}`, {
+          signal: controller.signal
+        })
+        clearTimeout(timeoutId)
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.result === 'invalid') {
+            if (data.reason === 'invalid_mailbox') {
+              return { valid: false, message: "This email mailbox does not exist. Please enter a real existing email." }
+            }
+            if (data.reason === 'disposable') {
+              return { valid: false, message: "Temporary/disposable email addresses are not allowed." }
+            }
+            if (data.reason === 'invalid_domain') {
+              return { valid: false, message: "The domain of this email address does not exist." }
+            }
+            return { valid: false, message: "Please enter a valid, existing email address." }
+          }
+          return { valid: true }
+        }
+      } catch (e) {
+        console.warn("QuickEmailVerification failed, falling back to basic checks:", e)
+      }
+    }
+
+    // 2. Query Disify API for MX / DNS and disposable status checking (Fallback)
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 4000)
