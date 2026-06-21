@@ -1,5 +1,6 @@
-// Trigger redeployment after repository visibility change
+// Trigger build after GitHub Secrets added
 import { defineConfig } from 'vite'
+
 import react from '@vitejs/plugin-react'
 
 
