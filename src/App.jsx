@@ -9,10 +9,68 @@ function App() {
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState(null)
 
+  const validateEmailWithApi = async (email) => {
+    // 1. Basic format regex
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!regex.test(email)) {
+      return { valid: false, message: "Please enter a valid email format." }
+    }
+
+    // Auto-correction suggestion for common typos
+    const domain = email.split('@')[1]?.toLowerCase()
+    const commonTypos = {
+      'gamil.com': 'gmail.com',
+      'gail.com': 'gmail.com',
+      'gmial.com': 'gmail.com',
+      'gmeil.com': 'gmail.com',
+      'yahooo.com': 'yahoo.com',
+      'yaho.com': 'yahoo.com',
+      'hotail.com': 'hotmail.com',
+      'hotmial.com': 'hotmail.com'
+    }
+    if (commonTypos[domain]) {
+      return { valid: false, message: `Did you mean ${email.split('@')[0]}@${commonTypos[domain]}?` }
+    }
+
+    // 2. Query Disify API for MX / DNS and disposable status checking
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 4000)
+
+      const response = await fetch(`https://disify.com/api/email/${encodeURIComponent(email)}`, {
+        signal: controller.signal
+      })
+      clearTimeout(timeoutId)
+
+      if (!response.ok) return { valid: true } // Fallback to true if API has issues
+
+      const data = await response.json()
+      if (!data.format) {
+        return { valid: false, message: "Invalid email format." }
+      }
+      if (data.disposable) {
+        return { valid: false, message: "Temporary/disposable email addresses are not allowed." }
+      }
+      if (!data.dns) {
+        return { valid: false, message: `The email domain '@${data.domain}' does not exist or cannot receive mail.` }
+      }
+      return { valid: true }
+    } catch (e) {
+      return { valid: true } // Fallback if API fails or timed out
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitted(true)
     setSubmitError(null)
+
+    const emailCheck = await validateEmailWithApi(formData.email)
+    if (!emailCheck.valid) {
+      setSubmitError(emailCheck.message)
+      setSubmitted(false)
+      return
+    }
 
     const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
 
@@ -135,6 +193,13 @@ function App() {
     setUnlockingCv(true)
     setCvFormError(null)
 
+    const emailCheck = await validateEmailWithApi(unlockEmailData.email)
+    if (!emailCheck.valid) {
+      setCvFormError(emailCheck.message)
+      setUnlockingCv(false)
+      return
+    }
+
     const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
 
     if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
@@ -183,13 +248,20 @@ function App() {
     setUnlockingCgpa(true)
     setCgpaFormError(null)
 
+    const emailCheck = await validateEmailWithApi(unlockEmailData.email)
+    if (!emailCheck.valid) {
+      setCgpaFormError(emailCheck.message)
+      setUnlockingCgpa(false)
+      return
+    }
+
     const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
 
     if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
       setTimeout(() => {
         setUnlockingCgpa(false)
         setCgpaUnlocked(true)
-        setShowCgpaModal(false)
+        setCgpaStep('success')
       }, 1000)
       return
     }
@@ -213,7 +285,7 @@ function App() {
       const result = await response.json()
       if (result.success) {
         setCgpaUnlocked(true)
-        setShowCgpaModal(false)
+        setCgpaStep('success')
       } else {
         setCgpaFormError(result.message || "Something went wrong. Please try again.")
       }
