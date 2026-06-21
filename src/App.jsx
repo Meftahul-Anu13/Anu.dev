@@ -55,12 +55,25 @@ function App() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  // CV and CGPA Unlock System
-  const [showUnlockModal, setShowUnlockModal] = useState(false)
-  const [unlockData, setUnlockData] = useState({ name: '', email: '' })
-  const [unlocked, setUnlocked] = useState(false)
-  const [unlocking, setUnlocking] = useState(false)
-  const [unlockError, setUnlockError] = useState(null)
+  // CV and CGPA Dual Custom Lock System
+  const [cvUnlocked, setCvUnlocked] = useState(false)
+  const [cgpaUnlocked, setCgpaUnlocked] = useState(false)
+
+  const [showCvModal, setShowCvModal] = useState(false)
+  const [showCgpaModal, setShowCgpaModal] = useState(false)
+
+  const [cvStep, setCvStep] = useState('captcha') // 'captcha' | 'form'
+  const [captchaError, setCaptchaError] = useState(null)
+
+  const [cgpaStep, setCgpaStep] = useState('riddle') // 'riddle' | 'form'
+  const [riddleAnswer, setRiddleAnswer] = useState('')
+  const [riddleError, setRiddleError] = useState(null)
+
+  const [unlockEmailData, setUnlockEmailData] = useState({ name: '', email: '' })
+  const [unlockingCv, setUnlockingCv] = useState(false)
+  const [unlockingCgpa, setUnlockingCgpa] = useState(false)
+  const [cvFormError, setCvFormError] = useState(null)
+  const [cgpaFormError, setCgpaFormError] = useState(null)
 
   const triggerCvDownload = () => {
     const link = document.createElement('a')
@@ -73,36 +86,88 @@ function App() {
 
   const handleCvDownloadClick = (e) => {
     e.preventDefault()
-    if (unlocked) {
+    if (cvUnlocked) {
       triggerCvDownload()
     } else {
-      setShowUnlockModal(true)
+      setCvStep('captcha')
+      setCaptchaError(null)
+      setCvFormError(null)
+      setShowCvModal(true)
     }
   }
 
   const handleRevealCgpaClick = () => {
-    if (!unlocked) {
-      setShowUnlockModal(true)
+    if (!cgpaUnlocked) {
+      setCgpaStep('riddle')
+      setRiddleAnswer('')
+      setRiddleError(null)
+      setCgpaFormError(null)
+      setShowCgpaModal(true)
+    }
+  }
+
+  const handleCaptchaSelect = (emoji) => {
+    if (emoji === '🧸') {
+      setCaptchaError(null)
+      setCvStep('form')
+    } else {
+      setCaptchaError(`Oops! That's a ${emoji === '🪳' ? 'Cockroach 🪳' : emoji === '🦖' ? 'T-Rex 🦖' : 'Ghost 👻'}. Choose the Teddy Bear!`)
+    }
+  }
+
+  const sendSilentNotification = async (subject, message) => {
+    const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+    if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
+      return
+    }
+    try {
+      await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `🔑 ${subject}`,
+          name: "Portfolio Visitor",
+          email: "noreply@anu.dev",
+          message: message
+        })
+      })
+    } catch (e) {
+      console.warn("Silent notification failed:", e)
+    }
+  }
+
+  const handleRiddleSubmit = (e) => {
+    e.preventDefault()
+    const ans = riddleAnswer.trim()
+    if (ans === '4') {
+      setCgpaUnlocked(true)
+      setShowCgpaModal(false)
+      sendSilentNotification('Riddle Solved 🧠', 'A visitor successfully solved your Python code riddle (len(set([1, 1, 2, 3, 5])) = 4) and unlocked your CGPA score!')
+    } else {
+      setRiddleError('Wrong answer! Think like a Python coder. 😉')
     }
   }
 
   const handleUnlockChange = (e) => {
-    setUnlockData({ ...unlockData, [e.target.name]: e.target.value })
+    setUnlockEmailData({ ...unlockEmailData, [e.target.name]: e.target.value })
   }
 
-  const handleUnlockSubmit = async (e) => {
+  const handleCvFormSubmit = async (e) => {
     e.preventDefault()
-    setUnlocking(true)
-    setUnlockError(null)
+    setUnlockingCv(true)
+    setCvFormError(null)
 
     const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
 
     if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
-      // Local fallback for demo
       setTimeout(() => {
-        setUnlocking(false)
-        setUnlocked(true)
-        setShowUnlockModal(false)
+        setUnlockingCv(false)
+        setCvUnlocked(true)
+        setShowCvModal(false)
         triggerCvDownload()
       }, 1000)
       return
@@ -117,25 +182,71 @@ function App() {
         },
         body: JSON.stringify({
           access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `🔑 CV & CGPA Unlocked by ${unlockData.name}`,
-          name: unlockData.name,
-          email: unlockData.email,
-          message: `${unlockData.name} (${unlockData.email}) has unlocked your CV download and CGPA grades on your portfolio.`,
+          subject: `📄 CV Downloaded by ${unlockEmailData.name}`,
+          name: unlockEmailData.name,
+          email: unlockEmailData.email,
+          message: `${unlockEmailData.name} (${unlockEmailData.email}) has downloaded your CV from your portfolio.`,
         })
       })
 
       const result = await response.json()
       if (result.success) {
-        setUnlocked(true)
-        setShowUnlockModal(false)
+        setCvUnlocked(true)
+        setShowCvModal(false)
         triggerCvDownload()
       } else {
-        setUnlockError(result.message || "Something went wrong. Please try again.")
+        setCvFormError(result.message || "Something went wrong. Please try again.")
       }
     } catch (err) {
-      setUnlockError("Network error. Please check your connection and try again.")
+      setCvFormError("Network error. Please check your connection and try again.")
     } finally {
-      setUnlocking(false)
+      setUnlockingCv(false)
+    }
+  }
+
+  const handleCgpaFormSubmit = async (e) => {
+    e.preventDefault()
+    setUnlockingCgpa(true)
+    setCgpaFormError(null)
+
+    const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+
+    if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
+      setTimeout(() => {
+        setUnlockingCgpa(false)
+        setCgpaUnlocked(true)
+        setShowCgpaModal(false)
+      }, 1000)
+      return
+    }
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `🔑 CGPA Unlocked by ${unlockEmailData.name}`,
+          name: unlockEmailData.name,
+          email: unlockEmailData.email,
+          message: `${unlockEmailData.name} (${unlockEmailData.email}) unlocked your CGPA score.`,
+        })
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        setCgpaUnlocked(true)
+        setShowCgpaModal(false)
+      } else {
+        setCgpaFormError(result.message || "Something went wrong. Please try again.")
+      }
+    } catch (err) {
+      setCgpaFormError("Network error. Please check your connection and try again.")
+    } finally {
+      setUnlockingCgpa(false)
     }
   }
 
@@ -525,7 +636,7 @@ function App() {
             <div className="edu-meta">
               <span>📅 2022 – Present</span>
               <span className="edu-score">
-                CGPA: {unlocked ? "3.71 / 4.00" : (
+                CGPA: {cgpaUnlocked ? "3.71 / 4.00" : (
                   <button onClick={handleRevealCgpaClick} className="edu-unlock-btn" title="Unlock CV & Grades">
                     🔒 Reveal CGPA
                   </button>
@@ -686,47 +797,155 @@ function App() {
         <p>© {new Date().getFullYear()} Meftahul Jannati Anonna</p>
       </footer>
 
-      {/* Unlock Grades & CV Modal */}
-      {showUnlockModal && (
+      {/* Custom CV Modal (Pookie Emoji Captcha Challenge) */}
+      {showCvModal && (
         <div className="unlock-modal-overlay">
           <div className="unlock-modal">
-            <button onClick={() => setShowUnlockModal(false)} className="unlock-modal-close">×</button>
-            <h3>Unlock Resume & Grades 🔐✨</h3>
-            <p>Please enter your Name and Email to download the full CV and view my CGPA.</p>
+            <button onClick={() => setShowCvModal(false)} className="unlock-modal-close">×</button>
             
-            {unlockError && (
-              <div className="contact-error" style={{ fontSize: '14px', padding: '10px', marginBottom: '15px' }}>
-                ❌ {unlockError}
-              </div>
+            {cvStep === 'captcha' ? (
+              <>
+                <h3>Verify You're Friendly! 🧸✨</h3>
+                <p>Click the <b>Teddy Bear 🧸</b> below to unlock the CV download option.</p>
+                {captchaError && (
+                  <div className="captcha-error-banner">
+                    ⚠️ {captchaError}
+                  </div>
+                )}
+                <div className="captcha-emojis-row">
+                  {['🦖', '🪳', '🧸', '👻'].map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => handleCaptchaSelect(emoji)}
+                      className="captcha-emoji-btn"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <h3>Almost There! 📄💖</h3>
+                <p>Please enter your Name and Email to download my CV.</p>
+                {cvFormError && (
+                  <div className="contact-error" style={{ fontSize: '14px', padding: '10px', marginBottom: '15px' }}>
+                    ❌ {cvFormError}
+                  </div>
+                )}
+                <form onSubmit={handleCvFormSubmit} className="unlock-modal-form">
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      name="name"
+                      value={unlockEmailData.name}
+                      onChange={handleUnlockChange}
+                      placeholder="Your Name"
+                      required
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <input
+                      type="email"
+                      name="email"
+                      value={unlockEmailData.email}
+                      onChange={handleUnlockChange}
+                      placeholder="Your Email"
+                      required
+                      className="form-control"
+                    />
+                  </div>
+                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={unlockingCv}>
+                    {unlockingCv ? 'Downloading... ✨' : 'Get my CV 🚀'}
+                  </button>
+                </form>
+              </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Custom CGPA Modal (Python Coder Challenge) */}
+      {showCgpaModal && (
+        <div className="unlock-modal-overlay">
+          <div className="unlock-modal">
+            <button onClick={() => setShowCgpaModal(false)} className="unlock-modal-close">×</button>
             
-            <form onSubmit={handleUnlockSubmit} className="unlock-modal-form">
-              <div className="form-group">
-                <input
-                  type="text"
-                  name="name"
-                  value={unlockData.name}
-                  onChange={handleUnlockChange}
-                  placeholder="Your Name"
-                  required
-                  className="form-control"
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="email"
-                  name="email"
-                  value={unlockData.email}
-                  onChange={handleUnlockChange}
-                  placeholder="Your Email"
-                  required
-                  className="form-control"
-                />
-              </div>
-              <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={unlocking}>
-                {unlocking ? 'Unlocking... 🔑' : 'Unlock & Download CV 🚀'}
-              </button>
-            </form>
+            {cgpaStep === 'riddle' ? (
+              <>
+                <h3>Unlocking University CGPA 🐍🧠</h3>
+                <p>Solve this quick Python riddle to reveal the CGPA instantly:</p>
+                
+                <div className="code-riddle-box">
+                  <code>len(set([1, 1, 2, 3, 5]))</code>
+                </div>
+
+                {riddleError && (
+                  <div className="captcha-error-banner" style={{ marginBottom: '15px' }}>
+                    ❌ {riddleError}
+                  </div>
+                )}
+
+                <form onSubmit={handleRiddleSubmit} className="riddle-form">
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      value={riddleAnswer}
+                      onChange={(e) => setRiddleAnswer(e.target.value)}
+                      placeholder="Enter the correct number"
+                      required
+                      className="form-control"
+                      style={{ textAlign: 'center', fontSize: '18px', fontWeight: 'bold' }}
+                    />
+                  </div>
+                  <button type="submit" className="btn-accent" style={{ width: '100%', justifyContent: 'center', marginBottom: '10px' }}>
+                    Submit Answer 🚀
+                  </button>
+                </form>
+
+                <button onClick={() => setCgpaStep('form')} className="skip-riddle-link">
+                  I'm not a coder / Skip with Email 📧
+                </button>
+              </>
+            ) : (
+              <>
+                <h3>Unlock Grades via Email 📬</h3>
+                <p>Enter your details to reveal my CGPA grades.</p>
+                {cgpaFormError && (
+                  <div className="contact-error" style={{ fontSize: '14px', padding: '10px', marginBottom: '15px' }}>
+                    ❌ {cgpaFormError}
+                  </div>
+                )}
+                <form onSubmit={handleCgpaFormSubmit} className="unlock-modal-form">
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      name="name"
+                      value={unlockEmailData.name}
+                      onChange={handleUnlockChange}
+                      placeholder="Your Name"
+                      required
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <input
+                      type="email"
+                      name="email"
+                      value={unlockEmailData.email}
+                      onChange={handleUnlockChange}
+                      placeholder="Your Email"
+                      required
+                      className="form-control"
+                    />
+                  </div>
+                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={unlockingCgpa}>
+                    {unlockingCgpa ? 'Unlocking... 🔑' : 'Reveal CGPA Score 🎓'}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}
