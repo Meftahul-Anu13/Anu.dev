@@ -6,19 +6,61 @@ function App() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
+  const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [submitError, setSubmitError] = useState(null)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitted(true)
-    setTimeout(() => {
+    setSubmitError(null)
+
+    // REPLACE THIS KEY with your free Web3Forms access key
+    // Get a free key instantly at: https://web3forms.com/
+    const WEB3FORMS_ACCESS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY_HERE"
+
+    if (WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
+      // Demo fallback behavior if the user hasn't set their key yet
+      setTimeout(() => {
+        setSubmitted(false)
+        setSubmitSuccess(true)
+        setFormData({ name: '', email: '', message: '' })
+      }, 1500)
+      return
+    }
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        })
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        setSubmitSuccess(true)
+        setFormData({ name: '', email: '', message: '' })
+      } else {
+        setSubmitError(result.message || "Something went wrong. Please try again.")
+      }
+    } catch (err) {
+      setSubmitError("Network error. Please check your connection and try again.")
+    } finally {
       setSubmitted(false)
-      setFormData({ name: '', email: '', message: '' })
-    }, 3000)
+    }
   }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
+
 
   // Resume Projects
   const projects = [
@@ -458,54 +500,70 @@ function App() {
 
         <div className="contact-section">
           <h2>Send Me a Letter! 💌</h2>
-          <form onSubmit={handleSubmit} className="contact-form">
-            <div className="form-group">
-              <label htmlFor="name">Your Name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Name"
-                required
-                className="form-control"
-              />
+          {submitSuccess ? (
+            <div className="contact-success">
+              <h3>Yay! Letter Sent! 🎉</h3>
+              <p>Thank you so much for writing to me! I'll read your letter and reply as soon as possible. 🧸💖</p>
+              <button onClick={() => setSubmitSuccess(false)} className="btn-primary" style={{ marginTop: '15px' }}>
+                Send Another Letter 📬
+              </button>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="contact-form">
+              {submitError && (
+                <div className="contact-error">
+                  ❌ {submitError}
+                </div>
+              )}
+              <div className="form-group">
+                <label htmlFor="name">Your Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Name"
+                  required
+                  className="form-control"
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="email">Your Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="email@example.com"
-                required
-                className="form-control"
-              />
-            </div>
+              <div className="form-group">
+                <label htmlFor="email">Your Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="email@example.com"
+                  required
+                  className="form-control"
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="message">Your Message</label>
-              <textarea
-                id="message"
-                name="message"
-                rows="4"
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Write your message here..."
-                required
-                className="form-control"
-              ></textarea>
-            </div>
+              <div className="form-group">
+                <label htmlFor="message">Your Message</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="4"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Write your message here..."
+                  required
+                  className="form-control"
+                ></textarea>
+              </div>
 
-            <button type="submit" className="btn-primary">
-              {submitted ? 'Sending... ✨' : 'Send Message 🚀'}
-            </button>
-          </form>
+              <button type="submit" className="btn-primary">
+                {submitted ? 'Sending... ✨' : 'Send Message 🚀'}
+              </button>
+            </form>
+          )}
         </div>
+
       </section>
 
       {/* Footer */}
