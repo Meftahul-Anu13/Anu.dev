@@ -133,46 +133,6 @@ function App() {
   const [cvFormError, setCvFormError] = useState(null)
   const [cgpaFormError, setCgpaFormError] = useState(null)
 
-  const [verificationCode, setVerificationCode] = useState('')
-  const [userEnteredCode, setUserEnteredCode] = useState('')
-  const [otpError, setOtpError] = useState(null)
-  const [sendingOtp, setSendingOtp] = useState(false)
-
-  const sendVerificationEmail = async (email, otpCode) => {
-    const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
-    const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
-    const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-
-    // Fallback if not configured: mock OTP print in browser console
-    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY || SERVICE_ID === "YOUR_SERVICE_ID_HERE") {
-      console.log(`%c[MOCK OTP]: Verification code for ${email} is ${otpCode}`, "color: #ff79c6; font-size: 16px; font-weight: bold;");
-      return true
-    }
-
-    try {
-      const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          service_id: SERVICE_ID,
-          template_id: TEMPLATE_ID,
-          user_id: PUBLIC_KEY,
-          template_params: {
-            to_email: email,
-            otp: otpCode,
-            to_name: unlockEmailData.name || "Visitor"
-          }
-        })
-      })
-      return response.ok
-    } catch (e) {
-      console.error("EmailJS error:", e)
-      return false
-    }
-  }
-
   const triggerCvDownload = () => {
     const link = document.createElement('a')
     link.href = `${import.meta.env.BASE_URL}cv.pdf`
@@ -240,38 +200,11 @@ function App() {
       return
     }
 
-    // Generate a 4-digit code
-    const otpCode = Math.floor(1000 + Math.random() * 9000).toString()
-    setVerificationCode(otpCode)
-    setUserEnteredCode('')
-    setOtpError(null)
-
-    const emailSent = await sendVerificationEmail(unlockEmailData.email, otpCode)
-    setUnlockingCv(false)
-
-    if (emailSent) {
-      setCvStep('otp')
-    } else {
-      setCvFormError("Could not send verification email. Please check your connection and try again.")
-    }
-  }
-
-  const handleCvOtpSubmit = async (e) => {
-    e.preventDefault()
-    setSendingOtp(true)
-    setOtpError(null)
-
-    if (userEnteredCode.trim() !== verificationCode) {
-      setOtpError("Incorrect verification code. Please check your inbox or spam folder.")
-      setSendingOtp(false)
-      return
-    }
-
     const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
 
     if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
       setTimeout(() => {
-        setSendingOtp(false)
+        setUnlockingCv(false)
         setCvUnlocked(true)
         setShowCvModal(false)
         triggerCvDownload()
@@ -288,10 +221,10 @@ function App() {
         },
         body: JSON.stringify({
           access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `📄 [VERIFIED] CV Downloaded by ${unlockEmailData.name}`,
+          subject: `📄 CV Downloaded by ${unlockEmailData.name}`,
           name: unlockEmailData.name,
           email: unlockEmailData.email,
-          message: `${unlockEmailData.name} (${unlockEmailData.email}) has VERIFIED their email address and downloaded your CV from your portfolio.`,
+          message: `${unlockEmailData.name} (${unlockEmailData.email}) has downloaded your CV from your portfolio.`,
         })
       })
 
@@ -301,12 +234,12 @@ function App() {
         setShowCvModal(false)
         triggerCvDownload()
       } else {
-        setOtpError(result.message || "Something went wrong during form submission. Please try again.")
+        setCvFormError(result.message || "Something went wrong. Please try again.")
       }
     } catch (err) {
-      setOtpError("Network error. Please check your connection and try again.")
+      setCvFormError("Network error. Please check your connection and try again.")
     } finally {
-      setSendingOtp(false)
+      setUnlockingCv(false)
     }
   }
 
@@ -322,38 +255,11 @@ function App() {
       return
     }
 
-    // Generate a 4-digit code
-    const otpCode = Math.floor(1000 + Math.random() * 9000).toString()
-    setVerificationCode(otpCode)
-    setUserEnteredCode('')
-    setOtpError(null)
-
-    const emailSent = await sendVerificationEmail(unlockEmailData.email, otpCode)
-    setUnlockingCgpa(false)
-
-    if (emailSent) {
-      setCgpaStep('otp')
-    } else {
-      setCgpaFormError("Could not send verification email. Please check your connection and try again.")
-    }
-  }
-
-  const handleCgpaOtpSubmit = async (e) => {
-    e.preventDefault()
-    setSendingOtp(true)
-    setOtpError(null)
-
-    if (userEnteredCode.trim() !== verificationCode) {
-      setOtpError("Incorrect verification code. Please check your inbox or spam folder.")
-      setSendingOtp(false)
-      return
-    }
-
     const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
 
     if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
       setTimeout(() => {
-        setSendingOtp(false)
+        setUnlockingCgpa(false)
         setCgpaUnlocked(true)
         setCgpaStep('success')
       }, 1000)
@@ -369,10 +275,10 @@ function App() {
         },
         body: JSON.stringify({
           access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `🔑 [VERIFIED] CGPA Unlocked by ${unlockEmailData.name}`,
+          subject: `🔑 CGPA Unlocked by ${unlockEmailData.name}`,
           name: unlockEmailData.name,
           email: unlockEmailData.email,
-          message: `${unlockEmailData.name} (${unlockEmailData.email}) has VERIFIED their email address and unlocked your CGPA score.`,
+          message: `${unlockEmailData.name} (${unlockEmailData.email}) unlocked your CGPA score.`,
         })
       })
 
@@ -381,12 +287,12 @@ function App() {
         setCgpaUnlocked(true)
         setCgpaStep('success')
       } else {
-        setOtpError(result.message || "Something went wrong during form submission. Please try again.")
+        setCgpaFormError(result.message || "Something went wrong. Please try again.")
       }
     } catch (err) {
-      setOtpError("Network error. Please check your connection and try again.")
+      setCgpaFormError("Network error. Please check your connection and try again.")
     } finally {
-      setSendingOtp(false)
+      setUnlockingCgpa(false)
     }
   }
 
@@ -964,7 +870,7 @@ function App() {
                   ))}
                 </div>
               </>
-            ) : cvStep === 'form' ? (
+            ) : (
               <>
                 <h3>Almost There! 📄💖</h3>
                 <p>Please enter your Name and Email to download my CV.</p>
@@ -997,49 +903,9 @@ function App() {
                     />
                   </div>
                   <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={unlockingCv}>
-                    {unlockingCv ? 'Sending Code... 📨' : 'Get my CV 🚀'}
+                    {unlockingCv ? 'Downloading... ✨' : 'Get my CV 🚀'}
                   </button>
                 </form>
-              </>
-            ) : (
-              <>
-                <h3>Enter Verification Code 🔒📨</h3>
-                <p>We've sent a 4-digit verification code to <b>{unlockEmailData.email}</b>. Please check your inbox (and spam folder).</p>
-                {otpError && (
-                  <div className="contact-error" style={{ fontSize: '14px', padding: '10px', marginBottom: '15px' }}>
-                    ❌ {otpError}
-                  </div>
-                )}
-                <form onSubmit={handleCvOtpSubmit} className="unlock-modal-form">
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      value={userEnteredCode}
-                      onChange={(e) => setUserEnteredCode(e.target.value)}
-                      placeholder="4-digit OTP Code"
-                      required
-                      maxLength={6}
-                      className="form-control"
-                      style={{ textAlign: 'center', fontSize: '18px', fontWeight: 'bold', letterSpacing: '4px' }}
-                    />
-                  </div>
-                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={sendingOtp}>
-                    {sendingOtp ? 'Verifying Code... 🔑' : 'Confirm & Download CV 📄'}
-                  </button>
-                </form>
-                <button
-                  onClick={async () => {
-                    const otpCode = Math.floor(1000 + Math.random() * 9000).toString()
-                    setVerificationCode(otpCode)
-                    setOtpError(null)
-                    const sent = await sendVerificationEmail(unlockEmailData.email, otpCode)
-                    if (sent) alert("A new verification code has been sent!")
-                  }}
-                  className="skip-riddle-link"
-                  style={{ marginTop: '15px' }}
-                >
-                  Resend Code 🔄
-                </button>
               </>
             )}
           </div>
@@ -1121,49 +987,9 @@ function App() {
                     />
                   </div>
                   <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={unlockingCgpa}>
-                    {unlockingCgpa ? 'Sending Code... 📨' : 'Reveal CGPA Score 🎓'}
+                    {unlockingCgpa ? 'Verifying... 🔑' : 'Reveal CGPA Score 🎓'}
                   </button>
                 </form>
-              </>
-            ) : cgpaStep === 'otp' ? (
-              <>
-                <h3>Enter Verification Code 🔒📨</h3>
-                <p>We've sent a 4-digit verification code to <b>{unlockEmailData.email}</b>. Please check your inbox (and spam folder).</p>
-                {otpError && (
-                  <div className="contact-error" style={{ fontSize: '14px', padding: '10px', marginBottom: '15px' }}>
-                    ❌ {otpError}
-                  </div>
-                )}
-                <form onSubmit={handleCgpaOtpSubmit} className="unlock-modal-form">
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      value={userEnteredCode}
-                      onChange={(e) => setUserEnteredCode(e.target.value)}
-                      placeholder="4-digit OTP Code"
-                      required
-                      maxLength={6}
-                      className="form-control"
-                      style={{ textAlign: 'center', fontSize: '18px', fontWeight: 'bold', letterSpacing: '4px' }}
-                    />
-                  </div>
-                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={sendingOtp}>
-                    {sendingOtp ? 'Verifying Code... 🔑' : 'Confirm & Reveal CGPA 🎓'}
-                  </button>
-                </form>
-                <button
-                  onClick={async () => {
-                    const otpCode = Math.floor(1000 + Math.random() * 9000).toString()
-                    setVerificationCode(otpCode)
-                    setOtpError(null)
-                    const sent = await sendVerificationEmail(unlockEmailData.email, otpCode)
-                    if (sent) alert("A new verification code has been sent!")
-                  }}
-                  className="skip-riddle-link"
-                  style={{ marginTop: '15px' }}
-                >
-                  Resend Code 🔄
-                </button>
               </>
             ) : (
               <>
