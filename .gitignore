@@ -15,6 +15,9 @@ dist-ssr
 *.local
 
 
+# Raw source photo (cropped version lives in src/assets)
+FormalDp.jpg
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
