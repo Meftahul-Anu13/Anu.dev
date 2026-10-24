@@ -1,16 +1,37 @@
-# React + Vite
+# Anu.dev — Meftahul Jannati Anonna's Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Personal portfolio site for Meftahul Jannati Anonna — CSE undergrad at IUT, AI Automation Engineer, and research collaborator. Built with React + Vite.
 
-Currently, two official plugins are available:
+**Live:** https://meftahul-anu13.github.io/Anu.dev/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Sections
 
-## React Compiler
+About · Experience · Research (publications & ongoing work) · Projects · Skills · Achievements · Education · Contact
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React 19 + Vite, plain CSS (no UI framework)
+- [Web3Forms](https://web3forms.com/) for the contact form and CV/CGPA unlock flows
+- QuickEmailVerification (via CORS proxy) with AbstractAPI as fallback, for email validation
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Getting Started
+
+```bash
+npm install
+npm run dev     # local dev server
+npm run build   # production build to dist/
+```
+
+## Environment Variables
+
+Create a `.env` file with:
+
+```
+VITE_WEB3FORMS_ACCESS_KEY=
+VITE_QUICKEMAILVERIFICATION_API_KEY=
+VITE_ABSTRACT_EMAIL_API_KEY=
+```
+
+## Deployment
+
+Auto-deploys to GitHub Pages via GitHub Actions (`.github/workflows/deploy.yml`) on every push to `main`.
