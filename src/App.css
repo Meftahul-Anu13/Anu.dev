@@ -1,4 +1,4 @@
-.app-container {
+﻿.app-container {
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -867,6 +867,14 @@
   color: var(--text-muted);
   border-top: var(--border-thick);
   margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.visitor-badge {
+  height: 20px;
 }
 
 /* Unlock Grades Modal */
@@ -1057,7 +1065,3 @@
 .riddle-form {
   margin-top: 15px;
 }
-
-
-
-

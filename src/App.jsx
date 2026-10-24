@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import avatarImg from './assets/avatar.png'
+import avatarImg from './assets/avatar-formal.jpg'
 import './App.css'
 
 function App() {
@@ -379,6 +379,42 @@ function App() {
   // Resume Projects
   const projects = [
     {
+      title: 'NymbusGuard',
+      emoji: '🛡️',
+      category: 'AI / Full Stack',
+      tags: ['Next.js', 'TypeScript', 'AI Agents', 'HubSpot API', 'Twilio'],
+      desc: 'An AI-powered revenue ops and video personalization engine combining AI agents, web scraping, HubSpot CRM integration, and voice synthesis.',
+      github: 'https://github.com/Meftahul-Anu13/NymbusGuard',
+      bgColor: 'var(--accent-lavender)'
+    },
+    {
+      title: 'CLIR Engine',
+      emoji: '🌐',
+      category: 'AI / Full Stack',
+      tags: ['FastAPI', 'Next.js', 'FAISS', 'Sentence Transformers'],
+      desc: 'A cross-lingual information retrieval system using semantic search and sentence transformers to power multilingual NLP search.',
+      github: 'https://github.com/Meftahul-Anu13/CLIR_Engine',
+      bgColor: 'var(--accent-mint)'
+    },
+    {
+      title: 'VisDrone Human Detection & Tracking',
+      emoji: '🛰️',
+      category: 'AI / Full Stack',
+      tags: ['YOLO11-P2', 'SAHI', 'ByteTrack', 'PyTorch'],
+      desc: 'A computer vision pipeline for detecting and tracking humans in drone footage using YOLO11-P2, SAHI tiled inference, and ByteTrack.',
+      github: 'https://github.com/Meftahul-Anu13/Visdrone-Human-Detections',
+      bgColor: 'var(--accent-yellow)'
+    },
+    {
+      title: 'RetailOS',
+      emoji: '🛒',
+      category: 'AI / Full Stack',
+      tags: ['FastAPI', 'Next.js', 'Supabase', 'Claude Vision', 'Gemini Vision'],
+      desc: 'An AI-native shelf intelligence and operations suite using Claude Vision and Gemini Vision for fraud detection, with Supabase and JWT auth.',
+      github: 'https://github.com/Meftahul-Anu13/Retailos-Sprint',
+      bgColor: 'var(--accent-pink)'
+    },
+    {
       title: 'CERENA Healthcare Assistant',
       emoji: '🏥',
       category: 'AI / Full Stack',
@@ -466,6 +502,7 @@ function App() {
         <div className="nav-links">
           <a href="#about" className="nav-item">About</a>
           <a href="#experience" className="nav-item">Experience</a>
+          <a href="#research" className="nav-item">Research</a>
           <a href="#projects" className="nav-item">Projects</a>
           <a href="#skills" className="nav-item">Skills</a>
           <a href="#achievements" className="nav-item">Achievements</a>
@@ -478,14 +515,14 @@ function App() {
         <div className="hero-left">
           <div className="badge-row">
             <span className="pookie-badge badge-pink">🎓 CSE Undergrad at IUT</span>
-            <span className="pookie-badge badge-mint">🧬 Research Enthusiast</span>
+            <span className="pookie-badge badge-mint">🤖 AI Automation Engineer</span>
             <span className="pookie-badge badge-lavender">🏆 Summit Winner</span>
           </div>
           <h1 className="hero-title">
             Hey, I'm <span>Meftahul Jannati Anonna</span>!
           </h1>
           <p className="hero-desc">
-            I am a Computer Science & Engineering undergraduate at the Islamic University of Technology (IUT), competitive programmer, AI developer, and Research Collaborator focused on building intelligent systems that blend cutting-edge AI with practical software engineering. My interests span Computer Vision, Machine Learning (including LLMs/VLMs), and full-stack development. Currently, I am working on NLP and Agentic AI, with a constant drive to design real-world solutions that bridge the gap between academic research and practical impact.
+            I am a Computer Science & Engineering undergraduate at the Islamic University of Technology (IUT), AI Automation Engineer at Aspire Tech Services and Solutions Corp., and Research Collaborator at Elite Research Lab, focused on building intelligent systems that blend cutting-edge AI with practical software engineering. My interests span Computer Vision, Machine Learning (including LLMs/VLMs), and full-stack development. Right now I'm digging into uncertainty quantification in LLM-based multi-agent systems and Bangla NLP, alongside my undergraduate thesis on speech emotion recognition, with a constant drive to bridge academic research and practical impact.
           </p>
           <div className="hero-buttons">
             <a href="#contact" className="btn-primary">Write Me 💌</a>
@@ -547,6 +584,23 @@ function App() {
           {/* Experience 1 */}
           <div className="experience-card">
             <div className="exp-left">
+              <div className="exp-role">AI Automation Engineer</div>
+              <div className="exp-company">
+                🚀 <a href="https://aspiretss.com/" target="_blank" rel="noopener noreferrer" className="exp-company-link">Aspire Tech Services and Solutions Corp.</a>
+              </div>
+              <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
+                Building AI automation pipelines and agentic workflows, connecting LLMs with production tooling to streamline business operations.
+              </p>
+            </div>
+            <div className="exp-right">
+              <span className="exp-date">July 2026 – Present</span>
+              <span className="exp-loc">📍 New York, NY, USA</span>
+            </div>
+          </div>
+
+          {/* Experience 2 */}
+          <div className="experience-card">
+            <div className="exp-left">
               <div className="exp-role">Research Collaborator</div>
               <div className="exp-company">
                 🔬 <a href="https://elitelab.ai/" target="_blank" rel="noopener noreferrer" className="exp-company-link">Elite Research Lab (elitelab.ai)</a>
@@ -561,7 +615,7 @@ function App() {
             </div>
           </div>
 
-          {/* Experience 2 */}
+          {/* Experience 3 */}
           <div className="experience-card">
             <div className="exp-left">
               <div className="exp-role">AI Full Stack Intern</div>
@@ -575,6 +629,76 @@ function App() {
             <div className="exp-right">
               <span className="exp-date">Oct 2025 – Dec 2025</span>
               <span className="exp-loc">📍 Dhaka, Bangladesh</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Research Section */}
+      <section id="research">
+        <div className="section-title-wrap">
+          <h2 className="section-title">Research</h2>
+          <p className="section-subtitle">Published work, ongoing investigations, and my undergraduate thesis</p>
+        </div>
+
+        <div className="experience-container">
+          <div className="experience-card">
+            <div className="exp-left">
+              <div className="exp-role">What Accuracy Hides: Measuring Adapter Drift in CUR-Factored Parameter-Efficient Fine-Tuning</div>
+              <div className="exp-company">
+                📄 <span className="exp-company-link">COLM 2026 Workshop on Efficient Reasoning</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
+                Investigated adapter drift in parameter-efficient fine-tuning (PEFT) and the limitations of conventional accuracy-based evaluation, exploring how fine-tuning alters model behavior beyond task-level performance.
+              </p>
+            </div>
+            <div className="exp-right">
+              <span className="exp-date">Published · 2026</span>
+            </div>
+          </div>
+
+          <div className="experience-card">
+            <div className="exp-left">
+              <div className="exp-role">Uncertainty in LLM-based Multi-Agent Systems</div>
+              <div className="exp-company">
+                🧠 <span className="exp-company-link">Ongoing Research</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
+                Investigating how uncertainty evolves before, during, and after known multi-agent system failures, and whether different failure modes (including overconfident failures) show distinguishable uncertainty patterns — with implications for agent reliability and trustworthy AI.
+              </p>
+            </div>
+            <div className="exp-right">
+              <span className="exp-date">2026 – Present</span>
+            </div>
+          </div>
+
+          <div className="experience-card">
+            <div className="exp-left">
+              <div className="exp-role">Bangla NLP</div>
+              <div className="exp-company">
+                🇧🇩 <span className="exp-company-link">Ongoing Research</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
+                Exploring natural language processing techniques for Bangla text and speech, working toward more robust low-resource language models.
+              </p>
+            </div>
+            <div className="exp-right">
+              <span className="exp-date">2026 – Present</span>
+            </div>
+          </div>
+
+          <div className="experience-card">
+            <div className="exp-left">
+              <div className="exp-role">Integrating Salient Features with MARS-Net: Multi-stream Angular Residual Speech Network for Speech Emotion Recognition</div>
+              <div className="exp-company">
+                🎓 <span className="exp-company-link">Undergraduate Thesis</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
+                Proposing a compact multi-stream architecture integrating Mel-spectrograms, Morlet wavelet scalograms, delta features, and chromagrams with residual CNNs, Latent Query Fusion, BiLSTM, and ArcFace for robust speech emotion recognition.
+              </p>
+            </div>
+            <div className="exp-right">
+              <span className="exp-date">2026 – Present</span>
             </div>
           </div>
         </div>
@@ -664,6 +788,8 @@ function App() {
               <span className="skill-pill">FastAPI</span>
               <span className="skill-pill">Flutter</span>
               <span className="skill-pill">Tailwind CSS</span>
+              <span className="skill-pill">Maven</span>
+              <span className="skill-pill">Insomnia</span>
             </div>
           </div>
 
@@ -705,6 +831,16 @@ function App() {
         <div className="achievements-grid">
           {/* Card 1 */}
           <div className="achievement-card">
+            <div className="achievement-icon">🥇</div>
+            <h3 className="achievement-title">Noverse Inc. National Hackathon</h3>
+            <div className="achievement-sub">1st Runners-Up</div>
+            <p className="achievement-desc">
+              Secured 1st runners-up position by designing and building an innovative AI-driven solution under a national hackathon timeline.
+            </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="achievement-card">
             <div className="achievement-icon">🏆</div>
             <h3 className="achievement-title">Responsible AI Summit 2026</h3>
             <div className="achievement-sub">Champion</div>
@@ -713,7 +849,7 @@ function App() {
             </p>
           </div>
 
-          {/* Card 2 */}
+          {/* Card 3 */}
           <div className="achievement-card">
             <div className="achievement-icon">🏅</div>
             <h3 className="achievement-title">HackCSB</h3>
@@ -723,7 +859,7 @@ function App() {
             </p>
           </div>
 
-          {/* Card 3 */}
+          {/* Card 4 */}
           <div className="achievement-card">
             <div className="achievement-icon">🥈</div>
             <h3 className="achievement-title">CUET CSE Datathon 2025</h3>
@@ -733,7 +869,7 @@ function App() {
             </p>
           </div>
 
-          {/* Card 4 */}
+          {/* Card 5 */}
           <div className="achievement-card">
             <div className="achievement-icon">👩‍💻</div>
             <h3 className="achievement-title">Girls' Programming Contest</h3>
@@ -919,6 +1055,11 @@ function App() {
       {/* Footer */}
       <footer className="footer">
         <p>© {new Date().getFullYear()} Meftahul Jannati Anonna</p>
+        <img
+          src="https://hits.sh/meftahul-anu13.github.io/Anu.dev.svg?style=flat-square&label=Portfolio%20Views&color=ffa4a4&labelColor=2b2525"
+          alt="Portfolio visitor count"
+          className="visitor-badge"
+        />
       </footer>
 
       {/* Custom CV Modal (Pookie Emoji Captcha Challenge) */}
